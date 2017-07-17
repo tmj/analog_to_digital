@@ -11,8 +11,10 @@ public class EffectEmitter : MonoBehaviour {
 
 	void OnCollisionEnter(Collision col) {
 		if (enabled) {
-			GameObject.Instantiate(effectPrefab, col.contacts[0].point, Quaternion.identity);
-			enabled = false;
+			if (col.gameObject.GetComponent<EffectEmitter>() != null) {
+				GameObject.Instantiate(effectPrefab, col.contacts[0].point, Quaternion.identity);
+				enabled = false;
+			}
 		}
 	}
 

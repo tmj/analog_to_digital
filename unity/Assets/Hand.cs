@@ -15,6 +15,9 @@ public class Hand : MonoBehaviour {
 
 	GameObject holding_object;
 
+	Vector3 speed;
+	int counter = 0;
+
 	// Update is called once per frame
 	void Update () {
 		pre_world_pos = world_pos;
@@ -26,6 +29,17 @@ public class Hand : MonoBehaviour {
 		//world_pos = Input.mousePosition;
 
 		transform.position = world_pos;
+		Vector3 tmp = world_pos - pre_world_pos;
+		if(tmp.magnitude >= 1.0f) {
+			speed = tmp ;
+			counter = 0;
+		}
+		else {
+			counter++;
+			if(counter > 15) {
+				speed = Vector3.zero;
+			}
+		}
 	}
 
 	void OnGUI() {
@@ -42,9 +56,11 @@ public class Hand : MonoBehaviour {
 	public void OnPointerDown(BaseEventData bed) {
 		Ray ray = Camera.main.ScreenPointToRay(mouse_screen_pos);
 		RaycastHit result;
-		if(Physics.Raycast(ray, out result)) {
-			holding_object = result.collider.gameObject;
-			Debug.Log("OnPointerDown");
+		if (Physics.Raycast(ray, out result)) {
+			if (result.collider.gameObject.tag == "Holdable") {
+				holding_object = result.collider.gameObject;
+				this.transform.localRotation = Quaternion.Euler(30, 0, 0);
+			}
 		}
 	}
 
@@ -52,16 +68,18 @@ public class Hand : MonoBehaviour {
 		if (holding_object != null) {
 			Rigidbody rigid_body = holding_object.GetComponent<Rigidbody>();
 			rigid_body.WakeUp();
-			rigid_body.AddForce((world_pos - pre_world_pos)*5000, ForceMode.Force);
+			rigid_body.AddForce(speed * 1000, ForceMode.Force);
+			rigid_body.AddTorque(speed * 200, ForceMode.Force);
 			holding_object.GetComponent<EffectEmitter>().enabled = true;
 			holding_object = null;
+			this.transform.localRotation = Quaternion.Euler(90, 0, 0);
 		}
 	}
 
 	public void OnDrag(BaseEventData bed) {
 		if(holding_object != null) {
 			Vector3 pos = this.transform.position;
-			pos.y -= 1;	
+			pos.y -= 2;	
 			holding_object.transform.position = pos;
 			holding_object.GetComponent<Rigidbody>().Sleep();
 		}
