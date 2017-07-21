@@ -109,9 +109,22 @@ public class Die : MonoBehaviour {
     void Update()
     {
 		// determine the value is the die is not rolling
-        if (!rolling && localHit)
-            GetValue();
+		if (!rolling && localHit) {
+			GetValue ();
+		}
+		if (rolling) {
+			startRoling = true;
+		}
+
+		if (startRoling && !rolling) {
+			if(eventRolled != null) eventRolled (value);
+			startRoling = false;
+			Debug.Log ("aaa");
+		}
     }
+
+	System.Action<int> eventRolled;
+	public bool startRoling = false;
 
 
 	// validate a test value against a value within a specific margin.
