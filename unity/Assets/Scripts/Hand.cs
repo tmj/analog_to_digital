@@ -97,6 +97,8 @@ public class Hand : MonoBehaviour {
 		if (holding_object != null) {
 			Rigidbody rigid_body = holding_object.GetComponent<Rigidbody>();
 			rigid_body.WakeUp();
+
+			speed.z = 2;
 			rigid_body.AddForce(speed * 3000, ForceMode.Force);
 			rigid_body.AddTorque(Vector3.up * 1000000, ForceMode.Force);
 			EffectEmitter ee = holding_object.GetComponent<EffectEmitter> ();
